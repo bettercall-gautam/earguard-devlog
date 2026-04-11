@@ -259,7 +259,7 @@ Verified: `java -version` returned `openjdk version "21.0.9"` ✅
 
 All errors encountered during this phase — root cause analysis, exact fix steps, code changes, and prevention tips — are documented in the dedicated PDF:
 
-📄 **[React Native Debugging Field Guide](./docs/RN-Debugging-Field-Guide.pdf)**
+📄 **[React Native Debugging Field Guide](./RN_Debugging_Guide_v2.pdf)**
 
 ### Key Commands
 
