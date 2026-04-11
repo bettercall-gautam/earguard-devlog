@@ -1,5 +1,7 @@
 # EarGuard — Developer Log (DEVLOG)
 
+> *This devlog documents my learning process while building EarGuard. It's a personal knowledge base, not a runnable project (yet).*
+
 > Chronological record of the EarGuard project: decisions made, tools installed, errors hit, and milestones reached. Spans 27 Mar – 11 Apr 2026.
 
 ---
