@@ -264,6 +264,8 @@ echo "sdk.dir=C\:\\Users\\Win\\AppData\\Local\\Android\\Sdk" > android/local.pro
 # Step 4: Build and install targeting phone directly
 npx expo run:android --device
 ```
+<!-- To recorrect the commit message April 12 not April 13-->
+
 
 **Key learnings:**
 - Always run `npx expo prebuild` before expecting icon/asset config changes to take effect
@@ -279,6 +281,7 @@ npx expo run:android --device
 - Confirmed ADB detection: `R9ZWC0LSNMX device` in `adb devices`
 - Used `adb reverse tcp:8081 tcp:8081` to tunnel Metro bundler to phone
 - App now running on physical device ✅
+
 
 #### Result
 
