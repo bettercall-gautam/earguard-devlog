@@ -214,6 +214,76 @@ Verified: `java -version` returned `openjdk version "21.0.9"` ✅
 
 ---
 
+---
+
+### 12 Apr 2026
+
+#### Issue 1: Emulator Black Screen on Startup
+
+- Emulator launched but showed pure black screen with no boot animation
+- ADB reported `device offline` when running `npx expo run:android`
+- Root cause: corrupted AVD snapshot from previous session
+- Fix:
+```powershell
+  adb kill-server
+  adb start-server
+```
+  Then Cold Boot the AVD from Android Studio → Device Manager → three dots → Cold Boot Now
+- Emulator booted successfully after cold boot ✅
+
+#### Issue 2: App Icon Not Updating (The Big One)
+
+Spent the majority of the session on this. Full breakdown:
+
+**What was attempted (did NOT work):**
+- Editing `app.json` foregroundImage path and rebuilding — Gradle skipped icon processing due to incremental build cache (392 of 422 tasks marked `up-to-date`)
+- Clearing emulator launcher cache
+- Uninstalling and reinstalling the APK
+- Running `gradlew clean` and rebuilding
+
+**Root causes discovered:**
+1. `npx expo run:android` does NOT reprocess icon assets from `app.json`. Icons are processed during `npx expo prebuild` which only runs once when the android folder is first generated. Every subsequent build reuses the old compiled icon files.
+2. Running `npx expo prebuild --platform android` wiped `android/local.properties` which caused every subsequent `npx expo run:android` to silently crash with zero terminal output.
+3. The original `patrick_bateman.png` had a solid background and non-square dimensions (704x489) — Android adaptive icons require a transparent background and square dimensions.
+
+**Image requirements for Android adaptive icons:**
+- Square dimensions (1024x1024 recommended, 416x416 worked fine)
+- Transparent background (used remove.bg to strip background)
+- Foreground image sits on top of `backgroundColor` in `app.json`
+
+**Fix sequence that finally worked:**
+```powershell
+# Step 1: Regenerate Android icon files from app.json
+npx expo prebuild --platform android
+
+# Step 2: Recreate local.properties (wiped by prebuild)
+echo "sdk.dir=C\:\\Users\\Win\\AppData\\Local\\Android\\Sdk" > android/local.properties
+
+# Step 3: Full PC restart (ADB and terminals were in broken state)
+
+# Step 4: Build and install targeting phone directly
+npx expo run:android --device
+```
+
+**Key learnings:**
+- Always run `npx expo prebuild` before expecting icon/asset config changes to take effect
+- `local.properties` must exist in the `android/` folder — prebuild can wipe it
+- Android adaptive icons need transparent background PNGs — iOS does not
+- When both emulator and phone are connected, use `--device` flag to get the picker, or pass the ADB device ID directly
+- `adb reverse tcp:8081 tcp:8081` is needed to tunnel Metro from PC to physical device over USB
+
+#### Physical Device Setup
+
+- Switched from charging cable to data cable
+- Enabled USB Debugging on Samsung phone (SM_A042F)
+- Confirmed ADB detection: `R9ZWC0LSNMX device` in `adb devices`
+- Used `adb reverse tcp:8081 tcp:8081` to tunnel Metro bundler to phone
+- App now running on physical device ✅
+
+#### Result
+
+Patrick Bateman icon successfully showing on phone home screen ✅
+
 ## 7. Roadmap
 
 ### Current Phase — Learning (berealclone tutorial)
@@ -250,7 +320,9 @@ Verified: `java -version` returned `openjdk version "21.0.9"` ✅
 | 10 Apr 2026 | `@expo/ui` canary crash resolved, clean rebuild done |
 | 10 Apr 2026 | React Native Debugging Field Guide PDF generated |
 | 11 Apr 2026 | This DEVLOG created |
-
+| 12 Apr 2026 | Emulator black screen fixed via ADB restart + Cold Boot |
+| 12 Apr 2026 | Physical device (Samsung SM_A042F) connected via USB for development |
+| 12 Apr 2026 | App icon successfully changed to custom image on physical device |
 ---
 
 ## 9. Resources
