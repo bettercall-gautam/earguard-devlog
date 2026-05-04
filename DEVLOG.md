@@ -2,7 +2,7 @@
 
 > *This devlog documents my learning process while building EarGuard. It's a personal knowledge base, not a runnable project (yet).*
 
-> Chronological record of the EarGuard project: decisions made, tools installed, errors hit, and milestones reached. Spans 27 Mar – 11 Apr 2026.
+> Chronological record of the EarGuard project: decisions made, tools installed, errors hit, and milestones reached. Spans 27 Mar – 4 May 2026.
 
 ---
 
@@ -13,7 +13,7 @@
 | Status | 🟡 In Progress |
 | Current Phase | Tutorial (berealclone — learning React Native before building EarGuard) |
 | Next Step | Complete berealclone tutorial, then begin EarGuard from scratch |
-| Last Updated | 11 Apr 2026 |
+| Last Updated | 4 May 2026 |
 | Platform | Android (Windows dev environment) |
 | SDK | Expo SDK 54 |
 
@@ -286,6 +286,73 @@ npx expo run:android --device
 #### Result
 
 Patrick Bateman icon successfully showing on phone home screen ✅
+
+---
+
+### 4 May 2026
+
+#### Supabase Auth Setup (BeReal Clone Tutorial)
+
+- Installed `@react-native-async-storage/async-storage` and `@supabase/supabase-js` via `npx expo install`
+- Created `lib/supabase/client.ts` with Supabase client using AsyncStorage for session persistence
+- Created `context/AuthContext.tsx` with React Context exporting `signUp` and `signIn` functions
+- Created `.env` with `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+#### Root Layout Fixes
+
+Three errors fixed in `app/_layout.tsx`:
+
+**"Attempted to navigate before mounting Root Layout":** React was trying to call `router.replace()` before the root component finished mounting. Fixed by wrapping navigation inside `setTimeout(..., 0)` within `useEffect` to defer it until after React commits the mount.
+
+**"NativeViewGestureHandler must be used as descendant of GestureHandlerRootView":** Expo Router needs `GestureHandlerRootView` wrapping the entire app for gesture-based navigation to work. Added `<GestureHandlerRootView style={{ flex: 1 }}>` around the Stack navigator.
+
+**`SafeAreaView` edges prop TypeScript error:** The `edges` prop exists in iOS type definitions but not Android, causing a type mismatch. Removed the prop entirely — SafeAreaView works correctly on both platforms by default.
+
+**Cache clearing:** Used `npx expo start -c` multiple times to clear Metro cache when environment variables or file moves caused stale state. Saved as a go-to command.
+
+#### VS Code Root Folder Issue (Major Debugging Session)
+
+VS Code showed persistent "Cannot find module" errors for both supabase and async-storage imports. `npx tsc --noEmit` returned clean but VS Code flagged errors anyway.
+
+**Root cause:** VS Code was opened in the parent folder `React_Native` instead of `React_Native\berealclone`. node_modules only exists inside berealclone, so VS Code couldn't resolve any imports. Additionally, `client.ts`, `AuthContext.tsx`, and `.env` had all been created in the parent folder during earlier work.
+
+**Fix steps:**
+- Closed all VS Code windows
+- Opened fresh PowerShell, navigated to `C:\Users\Win\Desktop\Coding_Stuff\React_Native\berealclone`
+- Ran `code .` to open VS Code with correct root
+- Moved files from parent into berealclone: `Move-Item ../lib/supabase/client.ts lib/supabase/client.ts`, `Move-Item ../context/AuthContext.tsx context/AuthContext.tsx`
+- Recreated `.env` inside berealclone with actual Supabase credentials
+- Cleaned up empty folders in parent directory
+
+**Key learning:** Always verify VS Code's root folder with `pwd` in the terminal. If the path doesn't end with the project name, all imports will fail because VS Code looks for node_modules in the wrong place.
+
+#### SignUp Screen Debugging
+
+Built `signup.tsx` with email/password form, validation alerts, and Supabase signup call wired through `useAuth()`.
+
+**Bugs encountered and fixed:**
+- Missing `return` statements after `Alert.alert()` calls caused multiple alerts to fire simultaneously
+- Empty `try` block with no `await signUp()` call — button had no effect
+- Missing closing brace `}` on `handleSignUp` function caused entire screen to render blank
+- Extra `};` at end of file caused Metro TransformSyntaxError
+- `SafeAreaView` `edges` prop removed (causes TypeScript error on Android due to iOS/Android typing mismatch)
+- `.env` file missing Supabase credentials caused "Network request failed" on signup attempt
+
+#### Login Screen
+
+Built `login.tsx` with the same pattern as signup: email/password form, `useAuth()` for `signIn` function, and navigation link to signup page. Removed unused `useRoute` import that was causing an ESLint warning.
+
+#### Onboarding Screen (Started)
+
+Built `onboarding.tsx` with profile completion UI: header section, profile image placeholder, and edit badge button.
+
+**Bug:** The `form` view (containing the image placeholder) was placed OUTSIDE the `content` view in the JSX structure, causing layout issues. Fixed by moving the closing `</View>` tag of `content` to wrap both the `header` and `form` views together. They need to be siblings inside `content`, not separate children of `SafeAreaView`.
+
+**Status:** Image placeholder section working correctly. Full onboarding form (name, username inputs) not yet completed.
+
+**Result:** Signup screen renders correctly, form validation alerts work, Supabase signup call connected. Login screen UI complete. Onboarding screen layout fixed, image placeholder working. Tested on both Pixel 8 emulator and physical Samsung device (SM-A042F). Next step: test full signup + signin flow with real credentials, then complete onboarding form inputs.
+
+---
 
 ## 7. Roadmap
 
