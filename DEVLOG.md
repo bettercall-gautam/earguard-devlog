@@ -137,6 +137,7 @@ Verified: `java -version` returned `openjdk version "21.0.9"` ✅
 | 5 Apr | Use Android Studio's bundled JDK for JAVA_HOME | Chocolatey JDK installed to an unresolvable path | Chocolatey JDK (couldn't locate it on the system) |
 | 10 Apr | Remove @expo/ui entirely | Canary version was broken on Android; tutorial author tested on iOS only | Keeping canary and debugging it (unstable, not worth it) |
 | 10 Apr | Replace Host + Button with View + TouchableOpacity | Standard React Native components, stable, no native dependency | @expo/ui equivalents (broken on Android canary) |
+| 4 May | Use `.env` with `EXPO_PUBLIC_` prefix for Supabase keys | Expo SDK 54 requires the `EXPO_PUBLIC_` prefix for environment variables to be accessible in the bundle | Hardcoding keys (unsafe, can't commit to git) |
 
 ---
 
@@ -360,6 +361,13 @@ Built `onboarding.tsx` with profile completion UI: header section, profile image
 - [x] Dev environment set up
 - [x] First native Android build
 - [x] Tab navigation working
+- [x] Supabase auth setup (client, context, .env)
+- [x] Root layout errors fixed (navigation, gesture handler, SafeAreaView)
+- [x] Signup screen built with form validation
+- [x] Login screen built
+- [ ] Complete onboarding screen (name, username inputs)
+- [ ] Test full signup + signin flow with real credentials
+- [ ] Complete remaining tutorial screens
 - [ ] Complete the full berealclone tutorial
 
 ### Next Phase — EarGuard Development
@@ -373,8 +381,6 @@ Built `onboarding.tsx` with profile completion UI: header section, profile image
 - [ ] Test on physical Android device via USB
 - [ ] Polish UI
 - [ ] Play Store release
-
----
 
 ## 8. Milestones
 
@@ -393,6 +399,7 @@ Built `onboarding.tsx` with profile completion UI: header section, profile image
 | 12 Apr 2026 | Emulator black screen fixed via ADB restart + Cold Boot |
 | 12 Apr 2026 | Physical device (Samsung SM_A042F) connected via USB for development |
 | 12 Apr 2026 | App icon successfully changed to custom image on physical device |
+| 4 May 2026 | Supabase auth setup complete, signup/login screens built |
 ---
 
 ## 9. Resources
