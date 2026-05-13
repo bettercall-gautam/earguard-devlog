@@ -215,8 +215,6 @@ Verified: `java -version` returned `openjdk version "21.0.9"` ✅
 
 ---
 
----
-
 ### 12 Apr 2026
 
 #### Issue 1: Emulator Black Screen on Startup
@@ -354,6 +352,78 @@ Built `onboarding.tsx` with profile completion UI: header section, profile image
 **Result:** Signup screen renders correctly, form validation alerts work, Supabase signup call connected. Login screen UI complete. Onboarding screen layout fixed, image placeholder working. Tested on both Pixel 8 emulator and physical Samsung device (SM-A042F). Next step: test full signup + signin flow with real credentials, then complete onboarding form inputs.
 
 ---
+### 5 May 2026
+
+#### Bug Fixes Carried Over From May 4 Session
+
+**Metro cache glitch (false syntax error):** App showed `Non-js exception: Compiling JS failed: 248105:3 '}' expected at end of object literal` on startup. Spent time investigating code before realising the fix was simply `npx expo start --clear`. No code was broken. Key learning: always clear Metro cache before assuming a code bug exists.
+
+**`isAuth` not wired to AuthContext:** `_layout.tsx` had `const isAuth = false` hardcoded as a local variable, never reading from `useAuth()`. Fixed by splitting `_layout.tsx` into two components: `RootLayout` (renders `AuthProvider` and `GestureHandlerRootView`) and `RootLayoutNav` (calls `useAuth()` and handles navigation logic). This split is required because `useAuth()` can only be called inside a component already wrapped by `AuthProvider` — calling it in the same component that renders the provider causes a context error.
+
+**Rogue `useEffect` in signup.tsx:** A `useEffect(() => { router.push("/(auth)/onboarding") }, [])` was left in from testing — it fired immediately on mount, sending users to onboarding before they could type anything. Removed it. Navigation to onboarding now happens only after a successful Supabase signup call.
+
+**Login button had no `onPress` handler:** The Sign In button in `login.tsx` was decorative. Wired it up to a proper `handleSignIn` async function with email/password validation, Supabase `signIn` call, loading state, and error alert.
+
+**Unused import in login.tsx:** `useRoute` from `@react-navigation/native` was imported but never used. Removed.
+
+#### expo-image-picker Setup
+
+- Installed `expo-image-picker` via `npx expo install expo-image-picker` (not `npm i` — Expo install auto-picks the SDK 54 compatible version)
+- Added `expo-image-picker` plugin to `app.json` plugins array with `photosPermission` string
+- Ran `npx expo prebuild --platform android` to apply plugin changes to native Android manifest
+- Recreated `android/local.properties` immediately after prebuild (prebuild wipes it silently every time)
+- Ran `npx expo run:android` to rebuild with native module compiled in
+- **Key learning:** `expo-image-picker` is a native module — it requires a full rebuild after install. Hot reload is not enough.
+- **Permission behaviour:** On the Android emulator, media library permissions are auto-granted silently. The permission dialog WILL appear on real physical devices. This is expected behaviour, not a bug.
+
+#### Emulator Gallery Setup
+
+- Used `adb push` to push test images into the emulator's `/sdcard/Pictures/` folder
+- Used `adb shell am broadcast` to force Android's media scanner to register new files so the photo picker can find them
+- **Key learning:** Files dropped into Downloads folder are NOT visible in the photo picker. Must be pushed to `/sdcard/Pictures/` or equivalent media folder.
+
+#### Onboarding Screen Completed
+
+- Completed `onboarding.tsx` with full name and username `TextInput` fields, profile image picker using `expo-image-picker`, circular image preview with edit badge, and Complete Setup button with loading state
+- Image picker flow: request permission → launch library → crop to 1:1 aspect ratio → display selected image in circular preview
+
+#### Supabase RLS Policies (Profiles Table)
+
+Set up Row Level Security on the `profiles` table in Supabase SQL Editor. RLS is a database-level security layer that restricts what each authenticated user can read or write, even if someone obtains the API key.
+
+Four policies created:
+
+| Policy | Operation | Rule |
+|--------|-----------|------|
+| Users can insert their own profile | INSERT | `auth.uid() = id` |
+| Users can update their own profile | UPDATE | `auth.uid() = id` |
+| Users can view their own profile | SELECT | `auth.uid() = id` |
+| Users can view other profiles | SELECT | `auth.uid() != id` |
+
+`auth.uid()` is a built-in Supabase function that returns the ID of the currently authenticated user.
+
+#### Supabase Database Function + Trigger
+
+Created a PostgreSQL function `handle_new_user` and a trigger `on_auth_user_created` that automatically inserts a blank row into `public.profiles` whenever a new user signs up via Supabase Auth.
+
+**Why this matters:** Supabase Auth and your `profiles` table are separate systems. When a user signs up, Supabase creates an entry in `auth.users` automatically, but your `profiles` table stays empty unless you manually insert a row. The trigger bridges this gap automatically.
+
+#### Supabase Storage Policies (Profiles Bucket)
+
+Created a public `profiles` bucket in Supabase Storage with four policies:
+
+| Policy | Operation | Target | Rule |
+|--------|-----------|--------|------|
+| Public can read profile images | SELECT | public | `bucket_id = 'profiles'` |
+| Users can upload their own profile images | INSERT | authenticated | `bucket_id = 'profiles' AND foldername[1] = auth.uid()` |
+| Users can update their own profile images | UPDATE | authenticated | `bucket_id = 'profiles' AND foldername[1] = auth.uid()` |
+| Users can delete their own profile images | DELETE | authenticated | `bucket_id = 'profiles' AND foldername[1] = auth.uid()` |
+
+The `storage.foldername(name)[1]` check ensures each user can only access files inside their own folder (named after their user ID), not anyone else's.
+
+**Result:** Full Supabase backend configured. Auth, RLS, database trigger, and storage policies all in place. Onboarding screen UI complete. Ready to wire up the complete signup → onboarding → profile save flow.
+
+---
 
 ## 7. Roadmap
 
@@ -365,7 +435,8 @@ Built `onboarding.tsx` with profile completion UI: header section, profile image
 - [x] Root layout errors fixed (navigation, gesture handler, SafeAreaView)
 - [x] Signup screen built with form validation
 - [x] Login screen built
-- [ ] Complete onboarding screen (name, username inputs)
+- [x] Complete onboarding screen (name, username inputs)
+- [ ] Wire up onboarding form to Supabase (save name, username, profile image)
 - [ ] Test full signup + signin flow with real credentials
 - [ ] Complete remaining tutorial screens
 - [ ] Complete the full berealclone tutorial
@@ -400,6 +471,7 @@ Built `onboarding.tsx` with profile completion UI: header section, profile image
 | 12 Apr 2026 | Physical device (Samsung SM_A042F) connected via USB for development |
 | 12 Apr 2026 | App icon successfully changed to custom image on physical device |
 | 4 May 2026 | Supabase auth setup complete, signup/login screens built |
+| 5 May 2026 | expo-image-picker integrated, Supabase RLS + storage policies configured, onboarding screen UI complete |
 ---
 
 ## 9. Resources
