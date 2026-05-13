@@ -13,7 +13,7 @@
 | Status | 🟡 In Progress |
 | Current Phase | Tutorial (berealclone — learning React Native before building EarGuard) |
 | Next Step | Complete berealclone tutorial, then begin EarGuard from scratch |
-| Last Updated | 5 May 2026 |
+| Last Updated | 13 May 2026 |
 | Platform | Android (Windows dev environment) |
 | SDK | Expo SDK 54 |
 
@@ -428,6 +428,22 @@ The `storage.foldername(name)[1]` check ensures each user can only access files 
 
 ---
 
+### 10 May 2026
+
+- Generated 4-part React Native Learning Docs PDF series as a comprehensive knowledge base for the berealclone codebase
+- Part 1: Concept Glossary (useState, useEffect, Context, TypeScript, JSX, async/await, Expo Router)
+- Part 2: Code Walkthrough (all 10 project files, every line explained, bugs annotated in context)
+- Part 3: Bugs + Prevention Laws + Cheatsheet
+- Part 4: The Missed Stuff
+
+### 13 May 2026
+
+- Updated DEVLOG.md with May 5 & May 10
+- Added RN Learning Docs to Resources section
+- Pushed updated devlog and all 4 PDF files to GitHub
+
+---
+
 ## 7. Roadmap
 
 ### Current Phase — Learning (berealclone tutorial)
@@ -475,6 +491,7 @@ The `storage.foldername(name)[1]` check ensures each user can only access files 
 | 12 Apr 2026 | App icon successfully changed to custom image on physical device |
 | 4 May 2026 | Supabase auth setup complete, signup/login screens built |
 | 5 May 2026 | expo-image-picker integrated, Supabase RLS + storage policies configured, onboarding screen UI complete |
+| 10 May 2026 | React Native Learning Docs generated (4-part PDF series covering concepts, code walkthrough, bugs, and missed topics) |
 ---
 
 ## 9. Resources
@@ -484,6 +501,22 @@ The `storage.foldername(name)[1]` check ensures each user can only access files 
 All errors encountered during this phase — root cause analysis, exact fix steps, code changes, and prevention tips — are documented in the dedicated PDF:
 
 📄 **[React Native Debugging Field Guide](./RN_Debugging_Guide_v2.pdf)**
+
+### React Native Learning Docs
+
+A 4-part PDF series generated on 10 May 2026 as a deep-dive knowledge base for the berealclone codebase:
+
+| Part | Title | Contents |
+|------|-------|----------|
+| Part 1 | Concept Glossary | useState, useEffect, Context, TypeScript, JSX, async/await, Expo Router — every core concept explained |
+| Part 2 | Code Walkthrough | All 10 project files, every line explained, bugs annotated in context |
+| Part 3 | Bugs + Prevention Laws + Cheatsheet | Every bug hit during development, root cause, fix, and rules to prevent recurrence |
+| Part 4 | The Missed Stuff | Concepts and patterns that came up but weren't fully covered in Parts 1–3 |
+
+📄 **[Part 1 — Concept Glossary](./RN_Guide_Part1_Concepts.pdf)**
+📄 **[Part 2 — Code Walkthrough](./RN_Guide_Part2_CodeWalkthrough.pdf)**
+📄 **[Part 3 — Bugs + Prevention Laws + Cheatsheet](./RN_Guide_Part3_Bugs_Prevention.pdf)**
+📄 **[Part 4 — The Missed Stuff](./RN_Guide_Part4_MissedStuff.pdf)**
 
 ### Key Commands
 
