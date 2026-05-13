@@ -13,7 +13,7 @@
 | Status | 🟡 In Progress |
 | Current Phase | Tutorial (berealclone — learning React Native before building EarGuard) |
 | Next Step | Complete berealclone tutorial, then begin EarGuard from scratch |
-| Last Updated | 4 May 2026 |
+| Last Updated | 5 May 2026 |
 | Platform | Android (Windows dev environment) |
 | SDK | Expo SDK 54 |
 
@@ -138,6 +138,9 @@ Verified: `java -version` returned `openjdk version "21.0.9"` ✅
 | 10 Apr | Remove @expo/ui entirely | Canary version was broken on Android; tutorial author tested on iOS only | Keeping canary and debugging it (unstable, not worth it) |
 | 10 Apr | Replace Host + Button with View + TouchableOpacity | Standard React Native components, stable, no native dependency | @expo/ui equivalents (broken on Android canary) |
 | 4 May | Use `.env` with `EXPO_PUBLIC_` prefix for Supabase keys | Expo SDK 54 requires the `EXPO_PUBLIC_` prefix for environment variables to be accessible in the bundle | Hardcoding keys (unsafe, can't commit to git) |
+| 5 May 2026 | Split `_layout.tsx` into `RootLayout` and `RootLayoutNav` components | `useAuth()` cannot be called in the same component that renders `AuthProvider` — the context doesn't exist yet at that point. Split required so navigation logic runs inside the provider | Single component approach (causes context error) |
+| 5 May 2026 | Use `npx expo install` over `npm i` for all Expo packages | Expo install auto-picks the correct SDK 54 compatible version. `npm i` grabs latest which may target a different SDK and cause incompatibilities | `npm i` (wrong version risk) |
+| 5 May 2026 | Public `profiles` bucket in Supabase Storage | Profile images need to be publicly readable for the feed to display other users' avatars without auth checks on every image load | Private bucket (would require signed URLs for every image, unnecessary overhead) |
 
 ---
 
